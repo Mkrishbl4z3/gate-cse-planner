@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0d1728" />
+    <title>GATE CSE Planner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#dashboard" aria-label="GATE CSE Planner home">
+          <span class="brand-mark">G</span>
+          <span>Gate<span>Track</span></span>
+        </a>
+
+        <div class="exam-card">
+          <span class="eyebrow">YOUR TARGET</span>
+          <strong>GATE 2027</strong>
+          <p id="countdown">Set your exam date</p>
+          <button class="text-button" id="set-date-button">Set date</button>
+        </div>
+
+        <nav class="main-nav" aria-label="Main navigation">
+          <button class="nav-link active" data-view="dashboard"><span>⌂</span> Overview</button>
+          <button class="nav-link" data-view="syllabus"><span>▤</span> My syllabus</button>
+          <button class="nav-link" data-view="revisions"><span>↻</span> Revision queue <b id="revision-badge">0</b></button>
+          <button class="nav-link" data-view="pyqs"><span>✦</span> PYQ tracker</button>
+          <button class="nav-link" data-view="insights"><span>◔</span> Insights</button>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <p><span class="sync-dot"></span> Saved in this browser</p>
+          <button class="text-button" id="export-button">Export backup</button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <button class="mobile-menu" id="mobile-menu" aria-label="Open menu">☰</button>
+          <div>
+            <p class="eyebrow" id="page-kicker">GATE CSE PREPARATION</p>
+            <h1 id="page-title">Your preparation, at a glance.</h1>
+          </div>
+          <button class="primary-button" id="quick-add-button"><span>+</span> Log progress</button>
+        </header>
+
+        <section class="view active" id="dashboard-view">
+          <div class="hero-grid">
+            <article class="hero-card">
+              <div class="hero-copy">
+                <span class="eyebrow">FULL CSE SYLLABUS</span>
+                <h2>Time is moving. Make today count.</h2>
+                <p>Every topic you finish, revise, and practise with PYQs moves the countdown in your favour.</p>
+                <button class="secondary-button" data-go-to="syllabus">Open syllabus <span>→</span></button>
+              </div>
+              <div class="countdown-clock" aria-label="Exam countdown">
+                <svg viewBox="0 0 180 180" aria-hidden="true">
+                  <defs><linearGradient id="clock-gradient" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#f8d47b"/><stop offset="1" stop-color="#ff9f83"/></linearGradient></defs>
+                  <circle class="clock-track" cx="90" cy="90" r="76"></circle>
+                  <circle class="clock-value" cx="90" cy="90" r="76"></circle>
+                </svg>
+                <div class="clock-copy"><strong id="countdown-days">—</strong><span>DAYS LEFT</span><small id="countdown-date">SET YOUR EXAM DATE</small><button class="clock-set-date" id="clock-date-button">Set target</button></div>
+              </div>
+            </article>
+            <article class="next-card" id="next-action-card">
+              <span class="eyebrow">NEXT BEST STEP</span>
+              <h3>Start your first topic</h3>
+              <p>Pick a topic in the syllabus and mark it as learning when you begin.</p>
+              <button class="text-button strong" data-go-to="syllabus">Choose a topic →</button>
+            </article>
+          </div>
+
+          <section class="metrics-grid" aria-label="Preparation totals">
+            <article class="metric-card"><span class="metric-icon violet">▤</span><div><span class="metric-label">Topics complete</span><strong id="complete-metric">0 / 0</strong><small id="complete-note">Start with one topic today</small></div></article>
+            <article class="metric-card"><span class="metric-icon coral">↻</span><div><span class="metric-label">Total revisions</span><strong id="revision-metric">0</strong><small id="revision-note">Log each revision, every time</small></div></article>
+            <article class="metric-card"><span class="metric-icon gold">✦</span><div><span class="metric-label">PYQs covered</span><strong id="pyq-metric">0</strong><small id="pyq-note">Track questions by topic</small></div></article>
+            <article class="metric-card"><span class="metric-icon teal">◷</span><div><span class="metric-label">Revision due</span><strong id="due-metric">0</strong><small id="due-note">Topics ready for another pass</small></div></article>
+          </section>
+
+          <section class="content-grid">
+            <article class="panel subject-panel">
+              <div class="panel-heading"><div><span class="eyebrow">SYLLABUS PROGRESS</span><h2>Subjects at a glance</h2></div><button class="text-button" data-go-to="syllabus">View all →</button></div>
+              <div class="subject-list" id="subject-summary"></div>
+            </article>
+            <article class="panel revision-panel">
+              <div class="panel-heading"><div><span class="eyebrow">SPACED REVISION</span><h2>Ready to revise</h2></div><button class="text-button" data-go-to="revisions">Open queue →</button></div>
+              <div class="queue-list" id="dashboard-queue"></div>
+            </article>
+          </section>
+        </section>
+
+        <section class="view" id="syllabus-view">
+          <div class="view-intro">
+            <div><h2>Full CSE syllabus</h2><p>Mark your status, then use the counters to record every revision and PYQ you cover.</p></div>
+            <label class="search-field"><span>⌕</span><input id="topic-search" type="search" placeholder="Search a topic" /></label>
+          </div>
+          <div class="filter-row" id="subject-filters"></div>
+          <div class="syllabus-layout">
+            <aside class="subject-rail" id="subject-rail" aria-label="Subjects"></aside>
+            <div class="topic-area" id="topic-area"></div>
+          </div>
+        </section>
+
+        <section class="view" id="revisions-view">
+          <div class="view-intro"><div><h2>Your revision queue</h2><p>After you record a revision, this topic returns in 1, 7, then 21 days. The counter always preserves every pass you make.</p></div></div>
+          <div class="revision-tabs" id="revision-tabs">
+            <button class="tab active" data-revision-filter="due">Due now</button>
+            <button class="tab" data-revision-filter="upcoming">Upcoming</button>
+            <button class="tab" data-revision-filter="all">All revised</button>
+          </div>
+          <div class="revision-list" id="revision-list"></div>
+        </section>
+
+        <section class="view" id="pyqs-view">
+          <div class="view-intro"><div><h2>PYQ coverage</h2><p>Record how many previous-year questions you solve per topic. Use this to find chapters that still need practice.</p></div></div>
+          <div class="pyq-overview" id="pyq-overview"></div>
+          <div class="panel pyq-table-panel">
+            <div class="panel-heading"><div><span class="eyebrow">BY TOPIC</span><h2>Question coverage</h2></div><label class="search-field compact"><span>⌕</span><input id="pyq-search" type="search" placeholder="Filter topics" /></label></div>
+            <div class="pyq-table" id="pyq-table"></div>
+          </div>
+        </section>
+
+        <section class="view" id="insights-view">
+          <div class="view-intro"><div><h2>Preparation insights</h2><p>A neutral picture of your coverage across the complete CSE syllabus.</p></div></div>
+          <section class="insights-grid">
+            <article class="panel"><div class="panel-heading"><div><span class="eyebrow">COVERAGE</span><h2>Completion by subject</h2></div></div><div class="bar-chart" id="completion-chart"></div></article>
+            <article class="panel"><div class="panel-heading"><div><span class="eyebrow">PRACTICE</span><h2>PYQs by subject</h2></div></div><div class="bar-chart" id="pyq-chart"></div></article>
+          </section>
+          <section class="insights-grid bottom-grid">
+            <article class="panel insight-callout" id="focus-insight"></article>
+            <article class="panel"><div class="panel-heading"><div><span class="eyebrow">REVISION RECORD</span><h2>Most revised</h2></div></div><div class="rank-list" id="revision-rankings"></div></article>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="progress-dialog" class="progress-dialog">
+      <form method="dialog" id="progress-form">
+        <div class="dialog-heading"><div><span class="eyebrow">LOG PROGRESS</span><h2 id="dialog-topic-title">Update topic</h2></div><button class="close-button" type="button" data-close-dialog="progress-dialog" aria-label="Close">×</button></div>
+        <label>Topic<select id="dialog-topic-select"></select></label>
+        <label>Status<select id="dialog-status"><option value="not-started">Not started</option><option value="learning">Learning</option><option value="practising">Practising</option><option value="revised">Revised</option><option value="complete">Complete</option></select></label>
+        <div class="dialog-number-row"><label>Revisions to add<input id="dialog-revisions" type="number" min="0" value="0" /></label><label>PYQs to add<input id="dialog-pyqs" type="number" min="0" value="0" /></label></div>
+        <label class="note-label">Study note <textarea id="dialog-note" rows="3" placeholder="Optional: resource, mistake, or next action"></textarea></label>
+        <button class="primary-button wide" value="default">Save progress</button>
+      </form>
+    </dialog>
+
+    <dialog id="date-dialog" class="progress-dialog small-dialog">
+      <form method="dialog" id="date-form">
+        <div class="dialog-heading"><div><span class="eyebrow">EXAM COUNTDOWN</span><h2>Set your GATE date</h2></div><button class="close-button" type="button" data-close-dialog="date-dialog" aria-label="Close">×</button></div>
+        <label>Exam date<input id="exam-date-input" type="date" /></label>
+        <button class="primary-button wide" value="default">Save date</button>
+      </form>
+    </dialog>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
