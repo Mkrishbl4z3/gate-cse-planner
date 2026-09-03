@@ -249,13 +249,17 @@ function selectedSubjects() {
   const query = $("#topic-search")?.value.trim().toLowerCase() || "";
   let subjects = state.selectedSubject === "all" ? SYLLABUS : SYLLABUS.filter((subject) => subject.id === state.selectedSubject);
   if (!query && completionFilter === "all") return subjects;
-  return subjects.filter((subject) => subjectTopics(subject.id).some((topic) => {
-    const matchesSearch = !query || `${topic.name} ${topic.group}`.toLowerCase().includes(query);
-    const matchesCompletion = completionFilter === "all" || 
-      (completionFilter === "completed" && topicData(topic).completed) ||
-      (completionFilter === "not-started" && !topicData(topic).completed);
-    return matchesSearch && matchesCompletion;
-  }));
+  
+  return subjects.filter((subject) => {
+    const hasMatchingTopics = subjectTopics(subject.id).some((topic) => {
+      const matchesSearch = !query || `${topic.name} ${topic.group}`.toLowerCase().includes(query);
+      const matchesCompletion = completionFilter === "all" || 
+        (completionFilter === "completed" && topicData(topic).completed) ||
+        (completionFilter === "not-started" && !topicData(topic).completed);
+      return matchesSearch && matchesCompletion;
+    });
+    return hasMatchingTopics;
+  });
 }
 
 function renderSubjectControls() {
@@ -288,7 +292,13 @@ function renderSyllabus() {
   $("#topic-area").innerHTML = subjects.length ? subjects.map((subject) => {
     const stat = subjectStats(subject.id);
     const groups = subject.groups.map((group) => {
-      const groupTopics = subjectTopics(subject.id).filter((topic) => topic.group === group.name && (!query || `${topic.name} ${topic.group}`.toLowerCase().includes(query)));
+      const groupTopics = subjectTopics(subject.id).filter((topic) => {
+        const matchesSearch = !query || `${topic.name} ${topic.group}`.toLowerCase().includes(query);
+        const matchesCompletion = completionFilter === "all" || 
+          (completionFilter === "completed" && topicData(topic).completed) ||
+          (completionFilter === "not-started" && !topicData(topic).completed);
+        return topic.group === group.name && matchesSearch && matchesCompletion;
+      });
       return groupTopics.length ? groupTopics.map(topicCard).join("") : "";
     }).join("");
     return `<section class="subject-section" id="section-${subject.id}"><header class="subject-section-header"><div><h2>${escapeHTML(subject.name)}</h2><p>${escapeHTML(subject.description)}</p></div><span class="subject-mini-progress">${stat.complete}/${stat.total} COMPLETE</span></header>${groups || `<div class="empty-state">No matching topic in this subject.</div>`}</section>`;
